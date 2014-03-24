@@ -1,0 +1,217 @@
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<html>
+<head>
+    <title>Demo of Storm Real-time Visualization thru WebSockets</title>
+    <style type="text/css">
+        .chart div {
+            font: 15px Rokkitt;
+            background-color: steelblue;
+            text-align: right;
+            padding: 3px;
+            margin: 1px;
+            color: white;
+        }
+
+        .chart rect {
+            stroke: white;
+            fill: steelblue;
+        }
+
+        .chart text {
+            fill: white;
+        }
+
+        button {
+            font-family: Rokkitt;
+            text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);
+        }
+    </style>
+    <link rel='stylesheet' type='text/css' href="assets/css/bootstrap.min.css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"/>
+    <script src="assets/js/bootstrap.min.js"/>
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Rokkitt'>
+
+    <script type='text/javascript'>
+    </script>
+</head>
+<body style="font-family: Rokkitt; font-size: 1em; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+<center>
+    &nbsp;&nbsp;&nbsp;
+    <div id="btns" style="width:700px;">
+        <button value="Start" id="start" class="btn btn-primary btn-large"><i
+                class="icon-white icon-play"></i> Start Viz
+        </button>
+        &nbsp;&nbsp;&nbsp;
+        <button value="Stop" id="stop" class="btn btn-warning btn-large"
+                style="font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><i
+                class="icon-black icon-stop"></i> Stop Viz
+        </button>
+    </div>
+
+    <div id="chart" style="width:700px; height:500px;"></div>
+    <div id="raw"></div>
+
+    <script>
+
+        if (!window.WebSocket) {
+            alert("WebSocket not supported by this browser");
+        }
+
+        var data = new Array();
+        function newDataReceived(newData) {
+            var jsonData = JSON.parse(newData);
+
+            var found = -1;
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].x == jsonData.state) {
+                    found = i;
+                    break;
+                }
+            }
+            if (found < 0) {
+                var graphData = {};
+                graphData.x = jsonData.state;
+                graphData.y = jsonData.sentiment;
+                data.push(graphData);
+
+                redraw(found, graphData);
+            } else {
+                data[found].y = jsonData.sentiment;
+                redraw(found, data[found]);
+            }
+
+//            redraw(data);
+        }
+        var socket = {
+            start: function () {
+                var location = "ws://localhost:9292/storm";
+                this._ws = new WebSocket(location);
+                this._ws.onmessage = this._onmessage;
+                this._ws.onclose = this._onclose;
+            },
+
+            _onmessage: function (m) {
+                if (m.data) {
+                    var theData = m.data;
+                    newDataReceived(m.data);
+                }
+            },
+
+            _onclose: function (m) {
+                if (this._ws) {
+                    this._ws.close();
+                }
+            }
+        };
+
+        function stop() {
+            socket._onclose(null);
+        }
+
+        function start() {
+            socket.start();
+        }
+
+        $(function () {
+            $('#start').on('click', function (e) {
+                start();
+            });
+            $('#stop').on('click', function (e) {
+                stop();
+            });
+        });
+        function redraw(index, data) {
+            if (index < 0) {
+                var series = {
+                    id: data.x,
+                    name: data.x,
+                    data: [data.y]
+                };
+                chart.addSeries(series);
+
+            } else {
+                for (var i = 0; i < chart.series.length; i++) {
+                    if (chart.series[i].name == data.x) {
+                        chart.series[i].setData([data.y]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'chart',
+                type: 'column'
+            },
+            title: {
+                text: 'Visualization of US Twitter sentiment'
+            },
+            xAxis: {
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Sentiment',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true
+	                    // formatter:function() {
+	                    //     return this.point.state + ":" + this.point.sentiment;
+	                    // }
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                floating: true,
+                borderWidth: 1,
+                backgroundColor: '#FFFFFF',
+                shadow: true
+            },
+            credits: {
+                enabled: false
+            },
+            series: [
+            ]
+        });
+    </script>
+    <div id="texthilite" style="width:700px;">
+        <center>
+            <h2 style="font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+                Stack: Storm Topology, JMS, ActiveMQ, Camel, WebSockets, Highcharts</h2>
+        </center>
+    </div>
+</center>
+</body>
+</html>

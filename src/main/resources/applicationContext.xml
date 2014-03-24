@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring-2.9.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd">
+
+
+    <camel:camelContext id="camel" trace="false">
+        <camel:routeBuilder ref="streamingRoute"/>
+    </camel:camelContext>
+
+    <bean id="streamingRoute" class="org.p7h.storm.sentimentanalysis.cameljms.StreamingRoute"/>
+
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent" depends-on="broker">
+        <property name="brokerURL" value="vm://myBroker?create=false&amp;waitForStart=5000"/>
+    </bean>
+    <!-- create an ActiveMQ broker --><!-- do not use the shutdown hook as it would cause the broker to shutdown when you press ctrl + c -->
+    <amq:broker id="broker" useJmx="true" persistent="false" brokerName="myBroker" useShutdownHook="false">
+        <amq:transportConnectors>
+            <amq:transportConnector name="vm" uri="vm://myBroker"/>
+        </amq:transportConnectors>
+    </amq:broker>
+
+    <amq:queue id="notificationQueue" physicalName="my-queue"/>
+    <amq:topic id="notificationTopic" physicalName="my-topic"/>
+    <!--<amq:connectionFactory id="jmsConnectionFactory" brokerURL="tcp://localhost:61616" />-->
+    <amq:connectionFactory id="jmsConnectionFactory" brokerURL="vm://myBroker"/>
+
+</beans>

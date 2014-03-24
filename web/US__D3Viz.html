@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style>
+    .chart div {
+        font: 15px Rokkitt;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        margin: 1px;
+        color: white;
+    }
+
+    .chart rect {
+        stroke: white;
+        fill: steelblue;
+    }
+
+    .chart text {
+        fill: white;
+    }
+
+    button {
+        font-family: Rokkitt;
+        text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);
+    }
+
+    path {
+        fill: none;
+        //stroke: #000;
+        //stroke-width: .5px;
+    }
+
+    .land-boundary {
+        stroke-width: 1px;
+    }
+
+    .state-boundary {
+        stroke: #000;
+        stroke-width: 1px;
+    }
+
+    .active {
+        fill: orange;
+    }
+
+    .stroke {
+        fill: none;
+        //stroke: #000;
+        //stroke-width: 3px;
+    }
+
+    .fill {
+        /*fill: #00BDFC;*/
+        fill: black;
+    }
+
+    .boundary {
+        fill: none;
+        //stroke: #fff;
+        //stroke-width: .5px;
+    }
+
+    .legend {
+        color: white;
+        font-size: 11px;
+    }
+
+    div.tooltip {
+        vertical-align: middle;
+        position: absolute;
+        text-align: center;
+        width: 150px;
+        height: 28px;
+        line-height: 28px;
+        padding: 1px;
+        font-size: 10px;
+        background: #FFFFE0;
+        border: 1px;
+        border-radius: 8px;
+        pointer-events: none;
+        color: black;
+    }
+
+    .states {
+      fill: #e5e5e5;
+      //stroke: #fff;
+      //stroke-width:2px;
+  }
+
+</style>
+<body style="background:#444C57; font-family: Rokkitt; font-size: 1em; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+    <!-- <div id="btns" style="width:700px;"> -->
+    <center>
+        <div id="btns" style="width:700px;">
+            <button value="Start" id="start" class="btn btn-primary btn-large"
+                    style="font-size: 18px; font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><span
+                    class="glyphicon glyphicon-play"></span> Start Viz
+            </button>
+            &nbsp;&nbsp;&nbsp;
+            <button value="Stop" id="stop" class="btn btn-warning btn-large"
+                    style="font-size: 18px; font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><span
+                    class="glyphicon glyphicon-stop"></span> Stop Viz
+            </button>
+        </div>
+        <div id="texthilite" style="width:700px;">
+            <center>
+                <h2 style="font-family: Rokkitt; color: white; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+                    Stack: Storm Topology, Twitter Streaming API, Bing Maps API, JMS, ActiveMQ, Camel, WebSockets, D3</h2>
+            </center>
+        </div>
+        <div id="chart" style="width:500; height:900;"></div>
+    </center>
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Rokkitt'/>
+    <link rel='stylesheet' type='text/css' href="assets/css/bootstrap.min.css"/>
+    <link rel='stylesheet' type='text/css' href="assets/css/bootstrap-responsive.min.css"/>
+    <link rel='stylesheet' type='text/css' href="assets/css/bootstrap-theme.min.css"/>
+    <script src="assets/js/d3.v3.min.js"></script>
+    <script src="assets/js/topojson.v1.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script>
+        if (!window.WebSocket) {
+            alert("WebSocket not supported by this browser");
+        }
+        var labels_for_legend = [ "-100", "0", "100"];
+        var ext_color_domain = [-100, 0, 100];
+        var color=d3.scale.linear().domain(ext_color_domain).range(["#ff0000", "#ffffff", "#00ff00"]).interpolate(d3.interpolateRgb);
+        var width = 900, height = 500;
+        var div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+        var path = d3.geo.path();
+
+        var svg = d3.select("#chart").append("svg").attr("width", width).attr("height", height);
+
+        var g = svg.append("g");
+        g.append("defs").append("path").datum({
+            type : "Sphere"
+        }).attr("id", "sphere").attr("d", path);
+
+        g.append("use").attr("class", "stroke").attr("xlink:href", "#sphere");
+
+        g.append("use").attr("class", "fill").attr("xlink:href", "#sphere");
+
+        var stateMap = {};
+        var populateById = {};
+        d3.tsv("assets/data/us-state-names.tsv", function(error, states) {
+            states.forEach(function(d) {
+                d.id = parseInt(d.id);
+                stateMap[d.id] = d.name;
+            });
+        });
+        
+        function newDataReceived(newData) {
+            var jsonData = JSON.parse(newData);
+            jsonData.id = parseInt(jsonData.id);
+            jsonData.count = parseInt(jsonData.count);
+            populateById[jsonData.id] = jsonData.count;
+            redraw();
+        }
+
+        function stop() {
+            socket._onclose(null);
+        }
+
+        function start() {
+            socket.start();
+        }
+
+        $(function () {
+            $('#start').on('click', function (e) {
+                start();
+            });
+            $('#stop').on('click', function (e) {
+                stop();
+            });
+        });
+
+        var socket = {
+            start: function () {
+                var location = "ws://localhost:9292/storm";
+                this._ws = new WebSocket(location);
+                this._ws.onmessage = this._onmessage;
+                this._ws.onclose = this._onclose;
+            },
+
+            _onmessage: function (m) {
+                if (m.data) {
+                    //var theData = m.data;
+                    newDataReceived(m.data);
+                }
+            },
+
+            _onclose: function (m) {
+                if (this._ws) {
+                    this._ws.close();
+                }
+            }
+        };
+
+        function stop() {
+            socket._onclose(null);
+        }
+
+        function start() {
+            socket.start();
+        }
+
+        function redraw() {
+
+	        d3.json('assets/data/us.json', function(error, topology) {
+	            var countries = topojson.feature(topology, topology.objects.states).features;
+
+	            g.selectAll(".country").data(countries).enter().append("path")
+	            .attr("class", "land-boundary").attr("d", path).style("fill", function(d) {
+	                var value = populateById[d.id];
+	                    //If the value is undefined, D3 shows the value as undefined in black color. Hence redefining value as 0.
+	                    if (value === undefined) {
+	                        value = 0;
+	                    }
+	                    return color(value);
+	                }).on("mouseover", function(d) {
+	                    var value = populateById[d.id];
+	                            if (value === undefined) {
+	                                value = 0;
+	                            }
+	                            d3.select(this).transition().duration(300)
+	                            .style("opacity", 1);
+	                            div.transition().duration(300).style("opacity",
+	                                                                 1)
+	                            div.text(stateMap[d.id] + " : " + value)
+	                            .style("left", (d3.event.pageX) + "px")
+	                            .style("top",
+	                                   (d3.event.pageY - 30) + "px");
+	                        }).on("mouseout", function() {
+	                            d3.select(this)
+	                            div.transition().duration(300).style("opacity", 0);
+	                        });
+
+	                        g.append("path").datum(topojson.mesh(topology, topology.objects.states, function(
+	                                                             a, b) {
+	                                                return a !== b;
+	                                            })).attr("class", "state-boundary").attr("d", path);
+
+	                        var legend = svg.selectAll("g.legend").data(ext_color_domain)
+	                        .enter().append("g").attr("class", "legend");
+
+	                        var ls_w = 20, ls_h = 20;
+
+	                        legend.append("rect").attr("x", 35).attr("y", function(d, i) {
+	                            return height - (i * ls_h) - 3.5 * ls_h;
+	                        }).attr("width", ls_w).attr("height", ls_h).style("fill",
+	                        function(d, i) {
+	                            return color(d);
+	                        }).style("opacity", 0.8);
+
+	                        legend.append("text").attr("x", 65).attr("y", function(d, i) {
+	                            return height - (i * ls_h) - ls_h - 35;
+	                        }).style("fill", function(d) {
+	                            return "white";
+	                        }).text(function(d, i) {
+	                            return labels_for_legend[i];
+	                        });
+	        });
+        }
+        </script>
+    </body>
+</html>
