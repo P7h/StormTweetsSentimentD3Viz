@@ -45,8 +45,8 @@
         }
     </style>
     <link rel='stylesheet' type='text/css' href="assets/css/bootstrap.min.css"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"/>
+    <script src="assets/js/jquery-2.1.0.min.js"></script>
+    <script src="assets/js/highcharts.js"/>
     <script src="assets/js/bootstrap.min.js"/>
     <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Rokkitt'>
 
@@ -82,20 +82,20 @@
 
             var found = -1;
             for (var i = 0; i < data.length; i++) {
-                if (data[i].x == jsonData.state) {
+                if (data[i].x == jsonData.id) {
                     found = i;
                     break;
                 }
             }
             if (found < 0) {
                 var graphData = {};
-                graphData.x = jsonData.state;
-                graphData.y = jsonData.sentiment;
+                graphData.x = jsonData.id;
+                graphData.y = jsonData.count;
                 data.push(graphData);
 
                 redraw(found, graphData);
             } else {
-                data[found].y = jsonData.sentiment;
+                data[found].y = jsonData.count;
                 redraw(found, data[found]);
             }
 
@@ -185,7 +185,7 @@
                     dataLabels: {
                         enabled: true
 	                    // formatter:function() {
-	                    //     return this.point.state + ":" + this.point.sentiment;
+	                    //     return this.point.id + ":" + this.point.count;
 	                    // }
                     }
                 }

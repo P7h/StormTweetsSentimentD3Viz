@@ -91,6 +91,7 @@
 <body style="background:#444C57; font-family: Rokkitt; font-size: 1em; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
     <!-- <div id="btns" style="width:700px;"> -->
     <center>
+        <h1 style="font-family: Rokkitt; color: white;">Real-time Visualization of US Twitter Sentiment</h1>
         <div id="btns" style="width:700px;">
             <button value="Start" id="start" class="btn btn-primary btn-large"
                     style="font-size: 18px; font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><span
@@ -104,8 +105,8 @@
         </div>
         <div id="texthilite" style="width:700px;">
             <center>
-                <h2 style="font-family: Rokkitt; color: white; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
-                    Stack: Storm Topology, Twitter Streaming API, Bing Maps API, JMS, ActiveMQ, Camel, WebSockets, D3</h2>
+                <h4 style="font-family: Rokkitt; color: white; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+                    Stack: Storm Topology, Twitter Streaming API, Bing Maps API, JMS, ActiveMQ, Camel, WebSockets, D3</h4>
             </center>
         </div>
         <div id="chart" style="width:500; height:900;"></div>
@@ -122,8 +123,8 @@
         if (!window.WebSocket) {
             alert("WebSocket not supported by this browser");
         }
-        var labels_for_legend = [ "-100", "0", "100"];
-        var ext_color_domain = [-100, 0, 100];
+        var labels_for_legend = [ "-30", "0", "30"];
+        var ext_color_domain = [-30, 0, 30];
         var color=d3.scale.linear().domain(ext_color_domain).range(["#ff0000", "#ffffff", "#00ff00"]).interpolate(d3.interpolateRgb);
         var width = 900, height = 500;
         var div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
@@ -140,12 +141,14 @@
 
         g.append("use").attr("class", "fill").attr("xlink:href", "#sphere");
 
-        var stateMap = {};
+        var stateNameMap = {};
         var populateById = {};
+        var stateCodeMap = {};
         d3.tsv("assets/data/us-state-names.tsv", function(error, states) {
             states.forEach(function(d) {
                 d.id = parseInt(d.id);
-                stateMap[d.id] = d.name;
+                stateNameMap[d.id] = d.name;
+                stateCodeMap[d.id] = d.code;
             });
         });
         
@@ -208,9 +211,13 @@
 
 	        d3.json('assets/data/us.json', function(error, topology) {
 	            var countries = topojson.feature(topology, topology.objects.states).features;
+                svg.selectAll(".country").remove()
+                svg.selectAll("text").remove();
+                svg.selectAll("g.legend").remove();
 
 	            g.selectAll(".country").data(countries).enter().append("path")
-	            .attr("class", "land-boundary").attr("d", path).style("fill", function(d) {
+	            .attr("class", "land-boundary").attr("d", path).transition()
+                    .duration(500).style("fill", function(d) {
 	                var value = populateById[d.id];
 	                    //If the value is undefined, D3 shows the value as undefined in black color. Hence redefining value as 0.
 	                    if (value === undefined) {
@@ -226,7 +233,7 @@
 	                            .style("opacity", 1);
 	                            div.transition().duration(300).style("opacity",
 	                                                                 1)
-	                            div.text(stateMap[d.id] + " : " + value)
+	                            div.text(stateNameMap[d.id] + " : " + value)
 	                            .style("left", (d3.event.pageX) + "px")
 	                            .style("top",
 	                                   (d3.event.pageY - 30) + "px");
@@ -234,6 +241,25 @@
 	                            d3.select(this)
 	                            div.transition().duration(300).style("opacity", 0);
 	                        });
+
+	                        g.selectAll("text")
+							    .data(countries)
+							    .enter()
+							    .append("text")
+							    .text(function(d){
+							    	console.log(parseInt(d.id));
+							    	console.log(stateCodeMap[parseInt(d.id)]);
+							        return stateCodeMap[parseInt(d.id)];
+							    })
+							    .attr("x", function(d){
+							        return path.centroid(d)[0];
+							    })
+							    .attr("y", function(d){
+							        return  path.centroid(d)[1];
+							    })
+							    .attr("text-anchor","middle")
+							    .attr('font-size','9pt');
+
 
 	                        g.append("path").datum(topojson.mesh(topology, topology.objects.states, function(
 	                                                             a, b) {
