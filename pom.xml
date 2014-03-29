@@ -189,6 +189,7 @@
             <directory>${basedir}/src/main/resources</directory>
             <includes>
                 <include>config.properties</include>
+                <include>log4j.properties</include>
                 <include>logback.xml</include>
                 <include>applicationContext.xml</include>
                 <include>AFINN-111.txt</include>

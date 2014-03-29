@@ -216,8 +216,7 @@
                 svg.selectAll("g.legend").remove();
 
 	            g.selectAll(".country").data(countries).enter().append("path")
-	            .attr("class", "land-boundary").attr("d", path).transition()
-                    .duration(500).style("fill", function(d) {
+	            .attr("class", "land-boundary").attr("d", path).style("fill", function(d) {
 	                var value = populateById[d.id];
 	                    //If the value is undefined, D3 shows the value as undefined in black color. Hence redefining value as 0.
 	                    if (value === undefined) {
