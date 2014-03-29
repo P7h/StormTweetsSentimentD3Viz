@@ -78,7 +78,7 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 
 	@Override
 	public final void declareOutputFields(final OutputFieldsDeclarer outputFieldsDeclarer) {
-		outputFieldsDeclarer.declare(new Fields("id", "sentiment"));
+		outputFieldsDeclarer.declare(new Fields("stateCode", "sentiment"));
 	}
 
 	@Override
@@ -89,9 +89,9 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 		Integer previousSentiment = stateSentimentMap.get(state);
 		previousSentiment = (null == previousSentiment) ? sentimentOfCurrentTweet : previousSentiment + sentimentOfCurrentTweet;
 		stateSentimentMap.put(state, previousSentiment);
-		int stateId = Constants.MAP_STATE_CODE_ID.get(state);
-		_outputCollector.emit(new Values(stateId, previousSentiment));
-		LOGGER.info("{}:{}", stateId, previousSentiment);
+		//int stateId = Constants.MAP_STATE_CODE_ID.get(state);
+		_outputCollector.emit(new Values(state, previousSentiment));
+		LOGGER.info("{}:{}", state, previousSentiment);
 
 		/*Integer previousSentiment = stateSentimentMap.get(state);
 		previousSentiment = (null == previousSentiment) ? sentimentOfTweet : previousSentiment + sentimentOfTweet;

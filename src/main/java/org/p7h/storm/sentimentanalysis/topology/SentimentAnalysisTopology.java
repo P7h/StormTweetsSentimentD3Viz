@@ -47,7 +47,7 @@ public final class SentimentAnalysisTopology {
 		jmsBolt.setJmsMessageProducer(new JmsMessageProducer() {
 			@Override
 			public final Message toMessage(final Session session, final Tuple input) throws JMSException {
-				final String json = "{\"id\":\"" + input.getInteger(0) + "\", \"count\":" + input.getInteger(1) + "}";
+				final String json = "{\"stateCode\":\"" + input.getString(0) + "\", \"sentiment\":" + input.getInteger(1) + "}";
 				return session.createTextMessage(json);
 			}
 		});
@@ -63,7 +63,7 @@ public final class SentimentAnalysisTopology {
 			//Create Bolt with the frequency of logging [in seconds].
 			topologyBuilder.setBolt("sentimentcalculatorbolt", new SentimentCalculatorBolt(30))
 					.fieldsGrouping("statelocatorbolt", new Fields("state"));
-			topologyBuilder.setBolt("jmsBolt", jmsBolt).fieldsGrouping("sentimentcalculatorbolt", new Fields("id"));
+			topologyBuilder.setBolt("jmsBolt", jmsBolt).fieldsGrouping("sentimentcalculatorbolt", new Fields("stateCode"));
 
 			//Submit it to the cluster, or submit it locally
 			if (null != args && 0 < args.length) {

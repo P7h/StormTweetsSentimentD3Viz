@@ -1,25 +1,6 @@
-<!--
-
-    Licensed to the Apache Software Foundation (ASF) under one or more
-    contributor license agreements.  See the NOTICE file distributed with
-    this work for additional information regarding copyright ownership.
-    The ASF licenses this file to You under the Apache License, Version 2.0
-    (the "License"); you may not use this file except in compliance with
-    the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
-
 <html>
 <head>
-    <title>Demo of Storm Real-time Visualization thru WebSockets</title>
+    <title>Highcharts Visualization of US Twitter Sentiment</title>
     <style type="text/css">
         .chart div {
             font: 15px Rokkitt;
@@ -54,21 +35,24 @@
     </script>
 </head>
 <body style="font-family: Rokkitt; font-size: 1em; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
-<center>
-    &nbsp;&nbsp;&nbsp;
-    <div id="btns" style="width:700px;">
-        <button value="Start" id="start" class="btn btn-primary btn-large"><i
-                class="icon-white icon-play"></i> Start Viz
-        </button>
-        &nbsp;&nbsp;&nbsp;
-        <button value="Stop" id="stop" class="btn btn-warning btn-large"
-                style="font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><i
-                class="icon-black icon-stop"></i> Stop Viz
-        </button>
-    </div>
-
-    <div id="chart" style="width:700px; height:500px;"></div>
+    <center>
+    <h1 style="font-family: Rokkitt; color: black;"><b>Real-time Visualization of US Twitter Sentiment</b></h1>
+        <h3 style="font-family: Rokkitt; color: black; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
+        <u>Stack</u>: Storm Topology, Twitter Streaming API, Bing Maps API, JMS, ActiveMQ, Camel, WebSockets and Highcharts</h3>
+        <div id="btns" style="width:700px;">
+            <button value="Start" id="start" class="btn btn-primary btn-large"
+                    style="font-size: 18px; font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><span
+                    class="glyphicon glyphicon-play"></span> Start Viz
+            </button>
+            &nbsp;&nbsp;&nbsp;
+            <button value="Stop" id="stop" class="btn btn-warning btn-large"
+                    style="font-size: 18px; font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8); color:#000000"><span
+                    class="glyphicon glyphicon-stop"></span> Stop Viz
+            </button>
+        </div>
+    <div id="chart" style="width:800px; height:500px;"></div>
     <div id="raw"></div>
+        </center>
 
     <script>
 
@@ -82,20 +66,20 @@
 
             var found = -1;
             for (var i = 0; i < data.length; i++) {
-                if (data[i].x == jsonData.id) {
+                if (data[i].x == jsonData.stateCode) {
                     found = i;
                     break;
                 }
             }
             if (found < 0) {
                 var graphData = {};
-                graphData.x = jsonData.id;
-                graphData.y = jsonData.count;
+                graphData.x = jsonData.stateCode;
+                graphData.y = jsonData.sentiment;
                 data.push(graphData);
 
                 redraw(found, graphData);
             } else {
-                data[found].y = jsonData.count;
+                data[found].y = jsonData.sentiment;
                 redraw(found, data[found]);
             }
 
@@ -164,7 +148,7 @@
                 type: 'column'
             },
             title: {
-                text: 'Visualization of US Twitter sentiment'
+                text: null
             },
             xAxis: {
                 title: {
@@ -185,7 +169,7 @@
                     dataLabels: {
                         enabled: true
 	                    // formatter:function() {
-	                    //     return this.point.id + ":" + this.point.count;
+	                    //     return this.point.stateCode + ":" + this.point.sentiment;
 	                    // }
                     }
                 }
@@ -206,12 +190,5 @@
             ]
         });
     </script>
-    <div id="texthilite" style="width:700px;">
-        <center>
-            <h2 style="font-family: Rokkitt; text-shadow: 0.025em 0.025em 0.025em rgba(0, 0, 0, 0.8);">
-                Stack: Storm Topology, JMS, ActiveMQ, Camel, WebSockets, Highcharts</h2>
-        </center>
-    </div>
-</center>
 </body>
 </html>

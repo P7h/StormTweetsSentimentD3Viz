@@ -8,9 +8,9 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>StormTweetsSentimentAnalysisWebSockets.log</file>
+        <file>StormTweetsSentimentD3Viz.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>StormTweetsSentimentAnalysisWebSockets-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>StormTweetsSentimentD3Viz-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -24,7 +24,7 @@
     <logger name="backtype" level="ERROR"/>
     <logger name="com.netflix.curator" level="ERROR"/>
     <logger name="org.apache.zookeeper" level="ERROR"/>
-    <logger name="org.p7h.storm.sentimentanalysis" level="INFO"/>
+    <logger name="org.p7h.storm.sentimentanalysis" level="ERROR"/>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
