@@ -110,12 +110,12 @@
         if (!window.WebSocket) {
             alert("WebSocket not supported by this browser");
         }
-        // var labels_for_legend = [ "-30", "0", "30"];
-        // var ext_color_domain = [-30, 0, 30];
-        // var color=d3.scale.linear().domain(ext_color_domain).range(["#ff0000", "#ffffff", "#00ff00"]).interpolate(d3.interpolateRgb);
-        var labels_for_legend = [ "<-50", "-35", "-25", "-15", "-5", "0", "5+", "15+", "25+", "35+", ">50"];
-        var ext_color_domain = [-50, -35, -25, -15, -5, 0, 5, 15, 25, 35, 50];
-        var color=d3.scale.linear().domain(ext_color_domain).range(["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"]).interpolate(d3.interpolateRgb);
+        var labels_for_legend = [ "-50", "0", "50"];
+        var ext_color_domain = [-50, 0, 50];
+        var color=d3.scale.linear().domain(ext_color_domain).range(["#ff0000", "#ffffff", "#00ff00"]).interpolate(d3.interpolateRgb);
+        // var labels_for_legend = [ "<-50", "-35", "-25", "-15", "-5", "0", "5+", "15+", "25+", "35+", ">50"];
+        // var ext_color_domain = [-50, -35, -25, -15, -5, 0, 5, 15, 25, 35, 50];
+        // var color=d3.scale.linear().domain(ext_color_domain).range(["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"]).interpolate(d3.interpolateRgb);
 
         var width = 900, height = 500;
         var div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
