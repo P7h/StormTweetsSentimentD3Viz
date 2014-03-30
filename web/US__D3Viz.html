@@ -202,7 +202,7 @@
 
         function redraw() {
 
-	        d3.json('assets/data/us.json', function(error, topology) {
+	        d3.json('assets/data/us-states.json', function(error, topology) {
 	            var countries = topojson.feature(topology, topology.objects.states).features;
                 svg.selectAll(".sentimentry").remove()
                 svg.selectAll("text").remove();

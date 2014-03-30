@@ -2,7 +2,7 @@
 ----------
 
 ## Introduction
-This repository contains an application which is built to demonstrate as an example of Storm distributed framework by performing sentiment analysis of tweets originating from U.S. in real-time. This Topology retrieves tweets originating from US and computes and visualizes the sentiment scores of each of the state of United States [based on tweets] in a Choropleth Map using D3 continuously for 10 minutes [in local mode]. User can also explicitly kill the topology for exiting the application. Also, there is a column chart visualization of each State and its sentiment value using Highcharts.
+This repository contains an application which is built to demonstrate as an example of Storm distributed framework by performing sentiment analysis of tweets originating from U.S. in real-time. This Topology retrieves tweets originating from US and computes and visualizes the sentiment scores of each of the state of United States [based on tweets] in a Choropleth Map using [D3.js](http://d3js.org) continuously for 10 minutes [in local mode]. User can also explicitly kill the topology by pressing `Ctrl+C` for exiting the application. Also, there is a column chart visualization of each State and its sentiment value using [Highcharts](http://www.highcharts.com).
 
 [Storm](http://storm-project.net) is a free and open source distributed real-time computation system, developed at BackType by Nathan Marz and team. It has been open sourced by Twitter [post BackType acquisition] in August, 2011.<br>
 This application has been developed and tested with Storm v0.8.2 and above [on Windows 7 in local mode]. Application works fine with Storm versions > v0.8.2.<br>
@@ -72,25 +72,24 @@ Rest of the required frameworks and libraries are downloaded by Maven as require
 To build and run this topology, you must use Java 1.7 or above, preferably JDK 8.0.
 
 ### Local Mode:
-* All the required frameworks and libraries are downloaded by Maven as required.
-* Local mode can also be run on Windows environment without installing any specific software or framework as such. *Note*: Please be sure to clear your temp folder as it adds lot of temporary files in every run.<br>
-* In local mode, this application can be run from command line by invoking:<br>
 
-    mvn clean compile exec:java -Dexec.classpathScope=compile -Dexec.mainClass=org.p7h.storm.sentimentanalysis.topology.SentimentAnalysisTopology
+* All the required frameworks and libraries are downloaded by Maven as required.<br>
+* Local mode can also be run on Windows environment without installing any specific software or framework as such. *Note*: Please be sure to clear your temp folder as it adds lot of temporary files in every run.<br>
+* In local mode, this application can be run from command line by invoking:
+
+> mvn clean compile exec:java -Dexec.classpathScope=compile -Dexec.mainClass=org.p7h.storm.sentimentanalysis.topology.SentimentAnalysisTopology
 
 or
 
-    mvn clean compile package && java -jar target/storm-sentiment-viz-0.1-jar-with-dependencies.jar
+> mvn clean compile package && java -jar target/storm-sentiment-viz-0.1-jar-with-dependencies.jar
+
 * Start Python SimpleHTTPServer in the [`web`](web) folder of this code repo. 
+> python -m SimpleHTTPServer
 
-    python -m SimpleHTTPServer
-
-* For D3 Choropleth Map visualization, launch a browser [preferably Google Chrome] and point to [`index.html`](http://localhost:8000)
-
+* For D3 Choropleth Map visualization, launch a browser [preferably Google Chrome] and point to [`index.html`](http://localhost:8000)<br>
 	* Click on "Start Viz" button to trigger the D3 Choropleth Map visualization.<br>
 	* You can stop the visualization anytime by clicking on "Stop Viz" button.<br>
 * This Map updates as and when a tweet is analyzed by Storm and displays in real-time, visualization of the sentiment value of each of the State of United States of America.<br>
-
 * For Highcharts visualization, launch a browser [preferably Google Chrome] and point to [`US__HighchartsViz.html`](http://localhost:8000/US__HighchartsViz.html) 
 	* Click on "Start Viz" button to trigger the Highcharts visualization.<br>
 	* You can stop the visualization as well by clicking on "Stop Viz" button.<br>
@@ -100,7 +99,7 @@ or
 Distributed mode requires a complete and proper Storm Cluster setup. Please refer this [wiki](https://github.com/nathanmarz/storm/wiki/Setting-up-a-Storm-cluster) for setting up a Storm Cluster.<br>
 In distributed mode, after starting Nimbus and Supervisors on individual machines, this application can be executed on the master [or Nimbus] machine by invoking the following on the command line:
 
-    storm jar target/storm-sentiment-viz-0.1.jar org.p7h.storm.sentimentanalysis.topology.SentimentAnalysisTopology SentimentAnalysis
+> storm jar target/storm-sentiment-viz-0.1.jar org.p7h.storm.sentimentanalysis.topology.SentimentAnalysisTopology SentimentAnalysis
 
 ## Problems
 If you find any issues, please report them either raising an [issue](https://github.com/P7h/StormTweetsSentimentD3Viz/issues) here on GitHub or alert me on my Twitter handle [@P7h](http://twitter.com/P7h). Or even better, please send a [pull request](https://github.com/P7h/StormTweetsSentimentD3Viz/pulls).
