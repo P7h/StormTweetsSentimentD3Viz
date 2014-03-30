@@ -32,6 +32,18 @@ This application has been tested in:<br>
 * This codebase has been updated with decent comments, wherever required.
 * Also this project has been made compatible with both Eclipse IDE and IntelliJ IDEA. Import the project in your favorite IDE [which has Maven plugin installed] and you can quickly follow the code.
 
+## Demo
+### D3 Choropleth Visualization
+#### GIF of D3 Choropleth Visualization
+![GIF of D3 Visualization](D3_Viz.gif)
+#### Screenshot of D3 Choropleth Visualization
+![Screenshot of D3 Visualization](D3_Viz.png)
+
+### Highcharts Visualization
+#### GIF of Highcharts Visualization
+![GIF of Highcharts Visualization](HC_Viz.gif)
+#### Screenshot of Highcharts Visualization
+![Screenshot of Highcharts Visualization](HC_Viz.png)
 
 ## Configuration
 * Please check the [`config.properties`](src/main/resources/config.properties#L3-6) and add your own values and complete the integration of Twitter API to your application by looking at your values from [Twitter Developer Page](https://dev.twitter.com/apps).<br>
@@ -60,6 +72,7 @@ You need the following on your machine:
 
 * Oracle JDK >= 1.7.x preferably JDK 8.0
 * Apache Maven >= 3.2.1
+* Python v2.7.x installed on the machine for triggering the visualization.
 * Clone this repo and import as an existing Maven project to either Eclipse IDE or IntelliJ IDEA.
 * This application uses [Google Guava](https://code.google.com/p/guava-libraries) for making life simple while using Collections and other generic stuff.
 * This application also uses [Jackson](http://jackson.codehaus.org) for unmarshalling the JSON response got from Bing Maps API.
@@ -72,7 +85,6 @@ Rest of the required frameworks and libraries are downloaded by Maven as require
 To build and run this topology, you must use Java 1.7 or above, preferably JDK 8.0.
 
 ### Local Mode:
-
 * All the required frameworks and libraries are downloaded by Maven as required.<br>
 * Local mode can also be run on Windows environment without installing any specific software or framework as such. *Note*: Please be sure to clear your temp folder as it adds lot of temporary files in every run.<br>
 * In local mode, this application can be run from command line by invoking:
@@ -86,14 +98,14 @@ or
 * Start Python SimpleHTTPServer in the [`web`](web) folder of this code repo. 
 > python -m SimpleHTTPServer
 
-* For D3 Choropleth Map visualization, launch a browser [preferably Google Chrome] and point to [`index.html`](http://localhost:8000)<br>
+* For D3 Choropleth Map visualization, launch a browser [preferably Google Chrome] and point to [`index.html`](http://localhost:8000) hosted on the above Python server.<br>
 	* Click on "Start Viz" button to trigger the D3 Choropleth Map visualization.<br>
 	* You can stop the visualization anytime by clicking on "Stop Viz" button.<br>
-* This Map updates as and when a tweet is analyzed by Storm and displays in real-time, visualization of the sentiment value of each of the State of United States of America.<br>
+	* This Map updates as and when a tweet is analyzed by Storm and displays in real-time, visualization of the sentiment value of each of the State of United States of America.<br>
 * For Highcharts visualization, launch a browser [preferably Google Chrome] and point to [`US__HighchartsViz.html`](http://localhost:8000/US__HighchartsViz.html) 
 	* Click on "Start Viz" button to trigger the Highcharts visualization.<br>
 	* You can stop the visualization as well by clicking on "Stop Viz" button.<br>
-* This chart updates every second and displays in real-time, visualization of the sentiment value of each of the State of United States of America.<br>
+	* This chart updates every second and displays in real-time, visualization of the sentiment value of each of the State of United States of America.<br>
 
 ### Distributed [or Cluster / Production] Mode:
 Distributed mode requires a complete and proper Storm Cluster setup. Please refer this [wiki](https://github.com/nathanmarz/storm/wiki/Setting-up-a-Storm-cluster) for setting up a Storm Cluster.<br>
