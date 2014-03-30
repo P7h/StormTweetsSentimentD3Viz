@@ -59,7 +59,7 @@ This project uses Maven to build and run the topology.<br>
 You need the following on your machine:
 
 * Oracle JDK >= 1.7.x preferably JDK 8.0
-* Apache Maven >= 3.1.1
+* Apache Maven >= 3.2.1
 * Clone this repo and import as an existing Maven project to either Eclipse IDE or IntelliJ IDEA.
 * This application uses [Google Guava](https://code.google.com/p/guava-libraries) for making life simple while using Collections and other generic stuff.
 * This application also uses [Jackson](http://jackson.codehaus.org) for unmarshalling the JSON response got from Bing Maps API.
