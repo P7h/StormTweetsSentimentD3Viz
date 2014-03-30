@@ -61,7 +61,7 @@ public final class SentimentAnalysisTopology {
 			topologyBuilder.setBolt("statelocatorbolt", new StateLocatorBolt())
 					.shuffleGrouping("twitterspout");
 			//Create Bolt with the frequency of logging [in seconds].
-			topologyBuilder.setBolt("sentimentcalculatorbolt", new SentimentCalculatorBolt(30))
+			topologyBuilder.setBolt("sentimentcalculatorbolt", new SentimentCalculatorBolt())
 					.fieldsGrouping("statelocatorbolt", new Fields("state"));
 			topologyBuilder.setBolt("jmsBolt", jmsBolt).fieldsGrouping("sentimentcalculatorbolt", new Fields("stateCode"));
 

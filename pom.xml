@@ -24,7 +24,7 @@
     <joda-time.version>2.3</joda-time.version>
     <guava.version>16.0.1</guava.version>
     <junit.version>4.11</junit.version>
-    <maven-jdk-version>1.7</maven-jdk-version>
+    <maven-jdk-version>1.8</maven-jdk-version>
     <activemq-camel.version>5.9.0</activemq-camel.version>
     <spring.version>4.0.3.RELEASE</spring.version>
     <camel.version>2.13.0</camel.version>
@@ -44,6 +44,11 @@
      <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+  </dependency>
+   <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
       <version>${slf4j.version}</version>
   </dependency>
 <dependency>

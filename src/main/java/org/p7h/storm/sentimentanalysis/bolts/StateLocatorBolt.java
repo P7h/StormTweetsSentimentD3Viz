@@ -55,6 +55,7 @@ public final class StateLocatorBolt extends BaseRichBolt {
 		}
 		//Bolt reads the Bing Maps API Value and stores the same to BING_MAPS_API_KEY_VALUE of Constants.java so that the Bolt can use it.
 		//For the lack of time I am using this Constant or else using a good Design Pattern, this can be fine-tuned.
+		//For Bing Maps Key: https://www.bingmapsportal.com
 		Constants.BING_MAPS_API_KEY_VALUE = properties.getProperty(Constants.BING_MAPS_API_KEY);
 	}
 

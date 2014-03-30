@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Highcharts Visualization of US Twitter Sentiment</title>
+    <title>Highcharts Viz of US Twitter Sentiment</title>
     <style type="text/css">
         .chart div {
             font: 15px Rokkitt;
@@ -95,7 +95,6 @@
 
             _onmessage: function (m) {
                 if (m.data) {
-                    var theData = m.data;
                     newDataReceived(m.data);
                 }
             },

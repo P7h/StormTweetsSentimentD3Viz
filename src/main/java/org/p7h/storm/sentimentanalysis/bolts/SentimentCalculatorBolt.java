@@ -35,18 +35,10 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -713541667509574750L;
 	private OutputCollector _outputCollector;
 
-	/**
-	 * Interval between logging the output.
-	 */
-	private final long logIntervalInSeconds;
-
-	private long runCounter;
-	private Stopwatch stopwatch = null;
 	private SortedMap<String,Integer> afinnSentimentMap = null;
 	private SortedMap<String,Integer> stateSentimentMap = null;
 
-	public SentimentCalculatorBolt(final long logIntervalInSeconds) {
-		this.logIntervalInSeconds = logIntervalInSeconds;
+	public SentimentCalculatorBolt(){
 	}
 
 	@Override
@@ -72,8 +64,6 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 			//Should not occur. If it occurs, we cant continue. So, exiting at this point itself.
 			System.exit(1);
 		}
-		runCounter = 0;
-		stopwatch = Stopwatch.createStarted();
 	}
 
 	@Override
@@ -92,16 +82,6 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 		//int stateId = Constants.MAP_STATE_CODE_ID.get(state);
 		_outputCollector.emit(new Values(state, previousSentiment));
 		LOGGER.info("{}:{}", state, previousSentiment);
-
-		/*Integer previousSentiment = stateSentimentMap.get(state);
-		previousSentiment = (null == previousSentiment) ? sentimentOfTweet : previousSentiment + sentimentOfTweet;
-		stateSentimentMap.put(state, previousSentiment);
-
-		if (logIntervalInSeconds <= stopwatch.elapsed(TimeUnit.SECONDS)) {
-			logSentimentsOfStates();
-			stopwatch.reset();
-			stopwatch.start();
-		}*/
 	}
 
 	/**
@@ -142,42 +122,5 @@ public final class SentimentCalculatorBolt extends BaseRichBolt {
 			truncatedTweet += tweet.substring(0, startOfURL) + tweet.substring(endOfURL);
 		}
 		return truncatedTweet;
-	}
-
-	/**
-	 * Logs the score of Sentiments of States at regular intervals.
-	 */
-	private final void logSentimentsOfStates() {
-		final StringBuilder dumpSentimentsToLog = new StringBuilder();
-
-		//Sort the Map before logging output based on the sentiment value so that we can get the happiest and unhappiest state.
-		final List<Map.Entry<String, Integer>> list = new ArrayList<>(stateSentimentMap.entrySet());
-		Collections.sort(list, new SentimentValueOrdering());
-
-		for (final Map.Entry<String, Integer> state : list) {
-			//Write to console and / or log file.
-			if(!state.getKey().isEmpty() && Constants.MAP_STATE_CODE_NAME.containsKey(state.getKey())) {
-				dumpSentimentsToLog
-						.append("\t\"")
-						.append(Constants.MAP_STATE_CODE_NAME.get(state.getKey()))
-						.append("\": [{\"count\": ")
-						.append(state.getValue())
-						.append("}],\n");
-				/*dumpSentimentsToLog
-						.append("\t")
-						.append(MAP_STATE_CODE_NAME.get(state.getKey()))
-						.append(" ==> ")
-						.append(state.getValue())
-						.append("\n");*/
-			}
-		}
-		this.runCounter++;
-		LOGGER.info("At {}, total # of States received in run#{}: {} ", new Date(), runCounter,
-				           stateSentimentMap.size());
-		LOGGER.info("\n{}", dumpSentimentsToLog.toString());
-
-		//Decide whether to clear this map or not!
-		//We better not clear it so that we can guage the sentiment value better.
-		//stateSentimentMap.clear();
 	}
 }
