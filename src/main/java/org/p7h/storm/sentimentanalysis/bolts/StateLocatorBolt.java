@@ -1,9 +1,5 @@
 package org.p7h.storm.sentimentanalysis.bolts;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -20,6 +16,10 @@ import twitter4j.GeoLocation;
 import twitter4j.Place;
 import twitter4j.Status;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * Gets the location of tweet by all 3 means and then fwds the State code with the tweet to the next Bolt.
  * There are three different objects within a tweet that we can use to determine it’s origin.
@@ -32,8 +32,8 @@ import twitter4j.Status;
  */
 public final class StateLocatorBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StateLocatorBolt.class);
-	private static final long serialVersionUID = -8097813984907419942L;
-	private OutputCollector _outputCollector;
+    private static final long serialVersionUID = -8097813984907419942L;
+    private OutputCollector _outputCollector;
 
 	public StateLocatorBolt() {
 		//No op
@@ -158,11 +158,11 @@ public final class StateLocatorBolt extends BaseRichBolt {
 		if (null != geoLocation) {
 			latitude = geoLocation.getLatitude();
 			longitude = geoLocation.getLongitude();
-			LOGGER.debug("LatLng for BingMaps:{} and {}", latitude, longitude);
+//			LOGGER.debug("LatLng for BingMaps:{} and {}", latitude, longitude);
 			final Optional<String> stateGeoOptional = BingMapsLookup.reverseGeocodeFromLatLong(latitude, longitude);
 			if(stateGeoOptional.isPresent()){
 				final String stateFromGeoLocation = stateGeoOptional.get();
-				LOGGER.debug("State from BingMaps:{}", stateFromGeoLocation);
+//				LOGGER.debug("State from BingMaps:{}", stateFromGeoLocation);
 				state = (2 == stateFromGeoLocation.length())? stateFromGeoLocation.toUpperCase(): null;
 			}
 		}

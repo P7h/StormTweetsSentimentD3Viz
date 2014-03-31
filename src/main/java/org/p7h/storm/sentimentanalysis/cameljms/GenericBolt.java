@@ -1,7 +1,5 @@
 package org.p7h.storm.sentimentanalysis.cameljms;
 
-import java.util.Map;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -9,10 +7,12 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
+import java.util.Map;
+
 @SuppressWarnings("serial")
 public class GenericBolt extends BaseRichBolt {
-	private static final long serialVersionUID = 4097079004411357712L;
-	private OutputCollector collector;
+    private static final long serialVersionUID = -3408183882931608130L;
+    private OutputCollector collector;
     private boolean autoAck = false;
     private boolean autoAnchor = false;
     private Fields declaredFields;
@@ -45,10 +45,7 @@ public class GenericBolt extends BaseRichBolt {
     }
 
     public void execute(Tuple input) {
-        System.out.println("[" + this.name + "] Received message: " + input);
-
-
-
+//        System.out.println("[" + this.name + "] Received message: " + input);
 // only emit if we have declared fields.
         if(this.declaredFields != null){
             System.out.println("[" + this.name + "] emitting: " + input);
@@ -60,7 +57,7 @@ public class GenericBolt extends BaseRichBolt {
         }
 
         if(this.autoAck){
-            System.out.println("[" + this.name + "] ACKing tuple: " + input);
+//            System.out.println("[" + this.name + "] ACKing tuple: " + input);
             this.collector.ack(input);
         }
 

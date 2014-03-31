@@ -1,14 +1,14 @@
 package org.p7h.storm.sentimentanalysis.cameljms;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-
 import backtype.storm.contrib.jms.JmsProvider;
 import org.springframework.context.ApplicationContext;
 
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+
 public class SpringJmsProvider implements JmsProvider {
-	private static final long serialVersionUID = -5605007910446316480L;
-	private ConnectionFactory connectionFactory;
+    private static final long serialVersionUID = 2198261240300136509L;
+    private ConnectionFactory connectionFactory;
     private Destination destination;
 
     /**

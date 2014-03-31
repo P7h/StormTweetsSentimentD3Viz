@@ -1,20 +1,12 @@
 package org.p7h.storm.sentimentanalysis.topology;
 
-import javax.jms.JMSException;
-
-import javax.jms.Message;
-import javax.jms.Session;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.StormSubmitter;
-import backtype.storm.contrib.jms.JmsMessageProducer;
 import backtype.storm.contrib.jms.JmsProvider;
 import backtype.storm.contrib.jms.bolt.JmsBolt;
-import backtype.storm.generated.AlreadyAliveException;
-import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 import backtype.storm.utils.Utils;
 import org.apache.xbean.spring.context.ClassPathXmlApplicationContext;
 import org.p7h.storm.sentimentanalysis.bolts.SentimentCalculatorBolt;
@@ -37,20 +29,17 @@ public final class SentimentAnalysisTopology {
 	public static final void main(final String[] args) throws Exception {
 		final ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-		final JmsProvider jmsQueueProvider = new SpringJmsProvider(applicationContext, "jmsConnectionFactory",
+		final JmsProvider jmsProvider = new SpringJmsProvider(applicationContext, "jmsConnectionFactory",
 				                                                          "notificationQueue");
 
 		final TopologyBuilder topologyBuilder = new TopologyBuilder();
 
 		final JmsBolt jmsBolt = new JmsBolt();
-		jmsBolt.setJmsProvider(jmsQueueProvider);
-		jmsBolt.setJmsMessageProducer(new JmsMessageProducer() {
-			@Override
-			public final Message toMessage(final Session session, final Tuple input) throws JMSException {
-				final String json = "{\"stateCode\":\"" + input.getString(0) + "\", \"sentiment\":" + input.getInteger(1) + "}";
-				return session.createTextMessage(json);
-			}
-		});
+		jmsBolt.setJmsProvider(jmsProvider);
+		jmsBolt.setJmsMessageProducer((session, input) -> {
+            final String json = "{\"stateCode\":\"" + input.getString(0) + "\", \"sentiment\":" + input.getInteger(1) + "}";
+            return session.createTextMessage(json);
+        });
 
 		try {
 			final Config config = new Config();
@@ -60,7 +49,6 @@ public final class SentimentAnalysisTopology {
 			topologyBuilder.setSpout("twitterspout", new TwitterSpout());
 			topologyBuilder.setBolt("statelocatorbolt", new StateLocatorBolt())
 					.shuffleGrouping("twitterspout");
-			//Create Bolt with the frequency of logging [in seconds].
 			topologyBuilder.setBolt("sentimentcalculatorbolt", new SentimentCalculatorBolt())
 					.fieldsGrouping("statelocatorbolt", new Fields("state"));
 			topologyBuilder.setBolt("jmsBolt", jmsBolt).fieldsGrouping("sentimentcalculatorbolt", new Fields("stateCode"));
@@ -89,9 +77,6 @@ public final class SentimentAnalysisTopology {
 					}
 				});
 			}
-		} catch (final AlreadyAliveException | InvalidTopologyException exception) {
-			//Deliberate no op;
-			exception.printStackTrace();
 		} catch (final Exception exception) {
 			//Deliberate no op;
 			exception.printStackTrace();

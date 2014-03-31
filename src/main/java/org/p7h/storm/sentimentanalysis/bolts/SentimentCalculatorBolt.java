@@ -1,9 +1,5 @@
 package org.p7h.storm.sentimentanalysis.bolts;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -13,16 +9,20 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import org.p7h.storm.sentimentanalysis.utils.Constants;
-import org.p7h.storm.sentimentanalysis.utils.SentimentValueOrdering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 import twitter4j.URLEntity;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Breaks each tweet into words and calculates the sentiment of each tweet and assocaites the sentiment value to the State
@@ -32,8 +32,8 @@ import twitter4j.URLEntity;
  */
 public final class SentimentCalculatorBolt extends BaseRichBolt {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SentimentCalculatorBolt.class);
-	private static final long serialVersionUID = -713541667509574750L;
-	private OutputCollector _outputCollector;
+    private static final long serialVersionUID = 1942195527233725767L;
+    private OutputCollector _outputCollector;
 
 	private SortedMap<String,Integer> afinnSentimentMap = null;
 	private SortedMap<String,Integer> stateSentimentMap = null;

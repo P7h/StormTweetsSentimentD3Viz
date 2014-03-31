@@ -1,16 +1,16 @@
 package org.p7h.storm.sentimentanalysis.utils;
 
+import com.google.common.base.Optional;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Optional;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class BingMapsLookup {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BingMapsLookup.class);
@@ -45,7 +45,7 @@ public final class BingMapsLookup {
 				.append(longitude)
 				.append(BING_MAPS_URL_MIDDLE_JSON)
 				.append(Constants.BING_MAPS_API_KEY_VALUE);
-		LOGGER.debug("BingMapsURL==>{}", bingMapsURL.toString());
+//		LOGGER.debug("BingMapsURL==>{}", bingMapsURL.toString());
 
 		HttpURLConnection httpURLConnection;
 		InputStream inputStream = null;
@@ -93,7 +93,7 @@ public final class BingMapsLookup {
 					final List<Map<String, Object>> resources = (List<Map<String, Object>>) resourceSets.get(0).get("resources");
 					if(resources != null && resources.size() > 0){
 						final Map<String, Object> address = (Map<String, Object>) resources.get(0).get("address");
-						LOGGER.debug("State==>{}", address.get("adminDistrict"));
+//						LOGGER.debug("State==>{}", address.get("adminDistrict"));
 						return Optional.of((String) address.get("adminDistrict"));
 					}
 				}
